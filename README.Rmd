@@ -1,0 +1,6 @@
+---
+title: "Pitch Predictor"
+author: "Kyle Gilbert"
+date: "2025-04-08"
+output: github_document
+---
