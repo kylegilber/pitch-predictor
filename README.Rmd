@@ -4,3 +4,12 @@ author: "Kyle Gilbert"
 date: "2025-04-08"
 output: github_document
 ---
+
+```{r}
+#| message: false
+#| warning: false
+
+# Import packages
+library(dplyr)
+```
+
