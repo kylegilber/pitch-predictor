@@ -8,8 +8,32 @@ output: github_document
 ```{r}
 #| message: false
 #| warning: false
+#| echo: false
 
 # Import packages
 library(dplyr)
 ```
 
+```{r}
+#| warning: false
+#| message: false
+#| echo: false
+
+# Set working directory
+setwd(dir = "~/Github/pitch-predictor/data")
+
+# List data files
+files <- list.files(path = "~/Github/pitch-predictor/data")
+
+# Initialize data frame 
+gamedata <- data.frame()
+
+# Load files
+for (i in 1:length(files)) {
+  temp <- read.csv(files[i], header = TRUE)
+  gamedata <- rbind(gamedata, temp)
+}
+
+# Remove temp variables
+rm(temp, i, files)
+```
