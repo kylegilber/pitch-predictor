@@ -121,6 +121,14 @@ pitcher_data <- pitcher_data %>%
   mutate(
     FIP = (13*HomeRun + 3*(Walk + HitByPitch) - 2*Strikeout) / Innings + 4.22
   )
+
+## Strikeouts per nine innings (K/9)
+
+# Compute K/9 metric ∀ pitchers
+pitcher_data <- pitcher_data %>% 
+  mutate(
+    K9 = (Strikeout / Innings) * 9
+  )
 ```
 
 
