@@ -1,5 +1,5 @@
 ---
-title: "Pitch Predictor"
+title: "Big Ten Baseball Standings Predictor"
 author: "Kyle Gilbert"
 date: "2025-04-08"
 output: github_document
@@ -119,7 +119,7 @@ rm(count_data, play_data, pitch_data, inning_data)
 # Compute FIP metric ∀ pitchers
 pitcher_data <- pitcher_data %>% 
   mutate(
-    FIP = (13 * HomeRun + 3 * (Walk + HitByPitch) - 2 * Strikeout) / Innings
+    FIP = (13*HomeRun + 3*(Walk + HitByPitch) - 2*Strikeout) / Innings + 4.22
   )
 ```
 
