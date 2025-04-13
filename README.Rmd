@@ -124,10 +124,18 @@ pitcher_data <- pitcher_data %>%
 
 ## Strikeouts per nine innings (K/9)
 
-# Compute K/9 metric ∀ pitchers
+# Compute K/9 statistic ∀ pitchers
 pitcher_data <- pitcher_data %>% 
   mutate(
     K9 = (Strikeout / Innings) * 9
+  )
+
+## Walks per nine innings (BB/9)
+
+# Compute BB/9 statistic ∀ pitchers
+pitcher_data <- pitcher_data %>% 
+  mutate(
+    BB9 = (Walk / Innings) * 9
   )
 ```
 
