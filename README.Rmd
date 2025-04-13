@@ -106,13 +106,19 @@ inning_data <- data %>%
   ungroup() %>% 
   count(Pitcher, name = "Innings")
 
+# Get pitcher team
+team_data <- data %>% 
+  group_by(Pitcher, PitcherTeam) %>% 
+  summarise()
+
 # Join individual pitcher data
 pitcher_data <- left_join(play_data, count_data, by = "Pitcher")
 pitcher_data <- left_join(pitcher_data, pitch_data[, c(1,8)], by = "Pitcher")
 pitcher_data <- left_join(pitcher_data, inning_data, by = "Pitcher")
+pitcher_data <- left_join(pitcher_data, team_data, by = "Pitcher")
 
 # Remove temp data frames
-rm(count_data, play_data, pitch_data, inning_data)
+rm(count_data, play_data, pitch_data, inning_data, team_data)
 
 ## Fielding independent pitching (FIP)
 
