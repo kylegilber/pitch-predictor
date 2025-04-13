@@ -20,7 +20,7 @@ library(tidyr)
 #| message: false
 #| echo: false
 
-## DATA COLLECTION
+### DATA COLLECTION
 
 # Set working directory
 setwd(dir = "~/Github/pitch-predictor/data")
@@ -29,12 +29,12 @@ setwd(dir = "~/Github/pitch-predictor/data")
 files <- list.files(path = "~/Github/pitch-predictor/data")
 
 # Initialize data frame 
-gamedata <- data.frame()
+data <- data.frame()
 
 # Load files
 for (i in 1:length(files)) {
   temp <- read.csv(files[i], header = TRUE)
-  gamedata <- rbind(gamedata, temp)
+  data <- rbind(data, temp)
 }
 
 # Remove temp variables
@@ -42,25 +42,85 @@ rm(temp, i, files)
 ```
 
 ```{r}
-#| echo: false
 #| message: false
+#| warning: false
+#| echo: false
 
-## DATA CLEANING
+### DATA CLEANING
 
 # Subset data frame
-gamedata <- gamedata[,-c(3,7,11,14,28,47:57,72:73,75,77:100,110:167)]
+data <- data[,-c(3,7,11,14,28,47:57,72:73,75,77:100,110:167)]
 
 # Convert columns to factor
-gamedata[,c(5,7,9,12,16:21)] <- lapply(gamedata[,c(5,7,9,12,16:21)], factor)
+data[,c(3,4,6,9,11:23)] <- lapply(data[,c(3,4,6,9,11:23)], factor)
 
 # Set "Undefined" level to NA
-levels(gamedata[,16])[levels(gamedata[,16]) == "Undefined"] <- NA
+levels(data[,16])[levels(data[,16]) == "Undefined"] <- NA
 
 # Replace empty strings with NA
-gamedata[gamedata == ""] <- NA
+data[data == ""] <- NA
 
 # Drop NA pitch types
-gamedata <- gamedata %>% filter(!is.na(gamedata[,16]))
-gamedata <- gamedata %>% filter(!is.na(gamedata[,2]))
+data <- data %>% filter(!is.na(data[,16]))
+data <- data %>% filter(!is.na(data[,2]))
 ```
+
+```{r}
+#| message: false
+#| warning: false
+#| echo: false
+
+### DATA TRANSFORMATION
+
+# Compute play result counts ∀ pitchers
+play_data <- data %>% 
+  count(Pitcher, PlayResult) %>% 
+  pivot_wider(
+    names_from = PlayResult,
+    values_from = n,
+    values_fill = 0
+  )
+
+# Count strikeouts & walks ∀ pitchers
+count_data <- data %>% 
+  count(Pitcher, KorBB) %>% 
+  pivot_wider(
+    names_from = KorBB,
+    values_from = n,
+    values_fill = 0
+  )
+
+# Count hit-by-pitches ∀ pitchers
+pitch_data <- data %>% 
+  count(Pitcher, PitchCall) %>% 
+  pivot_wider(
+    names_from = PitchCall,
+    values_from = n,
+    values_fill = 0
+  )
+
+# Count innings pitched ∀ pitchers
+inning_data <- data %>% 
+  group_by(Pitcher, Inning, Date) %>% 
+  summarise() %>% 
+  ungroup() %>% 
+  count(Pitcher, name = "Innings")
+
+# Join individual pitcher data
+pitcher_data <- left_join(play_data, count_data, by = "Pitcher")
+pitcher_data <- left_join(pitcher_data, pitch_data[, c(1,8)], by = "Pitcher")
+pitcher_data <- left_join(pitcher_data, inning_data, by = "Pitcher")
+
+# Remove temp data frames
+rm(count_data, play_data, pitch_data, inning_data)
+
+## Fielding independent pitching (FIP)
+
+# Compute FIP metric ∀ pitchers
+pitcher_data <- pitcher_data %>% 
+  mutate(
+    FIP = (13 * HomeRun + 3 * (Walk + HitByPitch) - 2 * Strikeout) / Innings
+  )
+```
+
 
